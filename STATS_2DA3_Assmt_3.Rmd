@@ -1,0 +1,153 @@
+---
+title: "STATS 2DA3 Assignment 3"
+author: "Faris Abuain"
+date: "2024-10-28"
+output: pdf_document
+geometry: margin=1.0in
+mainfont: Times New Roman
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
+
+
+1. a) Which table gives the best clustering result and why? (Think ARI or node purity.)
+
+We can determine which table gives the best clustering result using the Gini index as a measure of node purity. 
+
+First, let's calculate the proportion of observations from Class 1 and from Class 2 in each of nodes A, B, and C for Table 1:
+
+A: Proportion in class 1 = 40/240, proportion in class 2 = 200/240.
+
+The Gini index for A is sum of the term (pmk)(1-pmk) from k=1 to k=2 (the two classes), where pmk is the proportion of observations in class k.
+
+Thus the Gini index for A = (40/240)(1-40/240) + (200/240)(1-200/240) 
+
+= 2*(40/240)(200/240)
+
+= 0.278.
+
+For B and C in Table 1, all observations in each node are classified under a single class. Thus these nodes are completely pure, and have a Gini index of 0.
+
+The total weighted Gini index for Table 1 is thus:
+
+Gini = 0.278 * (240/400) + 0 * (60/400) + 0 * (100/400)
+
+= 0.167.
+
+Now, let's perform similar calculations for Table 2. 
+
+Once again, nodes B and C are completely pure and thus have a Gini index of 0.
+
+Let us focus on A: Proportion in class 1 = 50/250, proportion in class 2 = 200/250. 
+
+The Gini index for A = (50/250)(1-50/250) + (200/250)(1-200/250)
+
+= 2*(50/250)(200/250)
+
+= 0.32
+
+The total weighted Gini index for table 2 is thus:
+
+Gini = (250/400) * 0.32 + 0 + 0
+
+= 0.20
+
+As we can see, the Gini index for Table 2 is greater than the Gini index for Table 1, indicating greater node impurity. Thus we can conclude that Table 1 gives the best clustering result.
+
+
+2. a) Consider the classification table below. What is the misclassification rate? (correct to the nearest percent)
+
+Based on the given classification table, there are a total of 89 observations being classified. Of these 89 observations, 10 were misclassified as type 1 (5 of which were actually type 2 and type 3) and 17 were misclassified as type 3 (all were actually type 3). 
+
+That's a total of 27 misclassified observations out of 89 total, which gives an approximate misclassification rate of 30% (rounded to nearest percent).
+
+
+3. Using the fgl dataset from the MASS library, complete the following tasks:
+(Note: you may need to load additional libraries to answer the questions.)
+
+```{r}
+install.packages("MASS")
+library(MASS)
+data(fgl)
+```
+
+
+a) “Explore” your data using the head and str commands. How many observations are in the dataset?
+
+```{r}
+head(fgl)
+str(fgl)
+```
+
+We can observe from the above exploration that there are 214 observations in the fgl dataset.
+
+
+b) Set the seed to “1” and create a training set containing 120 observations selected at random. (The remaining observations should be used as your test set in future steps).
+
+```{r}
+set.seed(1)
+train_indices <- sample(1:214, 120)
+train_set <- fgl[train_indices, ]               
+test_set <- fgl[-train_indices, ]  
+```
+
+
+c) Build a Linear Discriminant Analysis (LDA) model using the training set, with the goal of predicting type, using all other predictor variables.
+
+```{r}
+lda_model <- lda(type ~ ., data = train_set)
+```
+
+
+d) Predict the classes of the observations in your test set using your model, i.e. apply your model to the test set.
+
+```{r}
+lda_predictions <- predict(lda_model, test_set)
+predicted_classes <- lda_predictions$class
+predicted_classes
+```
+
+
+e) Produce a classification table of your results.
+
+```{r}
+predicted_classes <- lda_predictions$class
+actual_classes <- test_set$type
+table_1 <- table(actual_classes, predicted_classes)
+table_1
+```
+
+
+f) What is the ARI for this classification result, correct to 4 decimal places?
+
+```{r}
+install.packages("e1071")
+```
+
+```{r}
+library(e1071)
+classAgreement(table_1)
+```
+
+Thus the ARI for our classification result is 0.2744 (correct to 4 decimal places).
+
+
+g) What is the misclassification rate, correct to the nearest percentage?
+
+We have a total of 94 observations in our test set which have been classified in the classification table in e). Per the table, we can count 35 observations which have been misclassified. This gives us a misclassifcation rate of 35/94, or 37% (correct to the nearest percentage).
+
+
+4. Consider the image below that illustrates Hierarchical clustering applied to
+a dataset.
+
+
+a) Which Dendrogram shows the most evidence of Chaining?
+
+Cluster Dendogram 3 shows the greatest evidence of chaining, which can be observed by the merging of clusters across the middle of the plot into one cluster. This occurs a height of approximately 2, indicating this collection of clusters became chained such that the distance between them all is around 2. 
+
+
+END OF ASSIGNMENT.
