@@ -1,0 +1,119 @@
+---
+title: "STATS 2DA3 Assignment 2"
+author: "Faris Abuain"
+date: "2024-10-07"
+output: pdf_document
+geometry: margin=1.0in
+mainfont: Times New Roman
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
+
+1. 
+
+a) Describe k-means clustering and k-medoids clustering.
+
+
+Both k-means clustering and k-medoids clustering are methods of classifying a set of data into k clusters. 
+
+k-means clustering begins by assigning k random points as the intial 'means'. Data points are then assigned to one of k clusters based on their Euclidean distance to each mean. After data points are assigned to the cluster whose mean has the lowest dissimilarity, the mean for each of the k clusters is updated to be the average of the data points in that cluster. The process then repeats, terminating once one of the following stopping conditions is reached: 
+
+- no data points change clusters between two iterations; 
+
+- the sum of dissimilarity in a cluster is minimized; 
+
+- or a given number of iterations is reached. 
+
+In k-medoids clustering, instead of assigning k *random points* as the initial 'means', the k initial 'medoids' are chosen from among the points in the data set. Once data points are assigned to the cluster whose medoid is the least dissimilar, the dissimilarity of each point in the cluster to the medoid is summed. This value is known as the 'cost'. A random non-medoid point in the cluster is then chosen to be the new medoid, and the cost is recalculated. If the cost is lower, this point is chosen as the new medoid, and the clusters are updated based on the new dissimilarity of each point in, and the new medoid of, the cluster. This process continues until the new medoid has a greater cost than the previous medoid, at which point the previous medoid is selected as the final medoid for that cluster, minimizing the total dissimilarity in each cluster. 
+
+
+b) Would you expect k-means clustering to work well on the 3 clusters depicted below? Explain your answer.
+
+
+No, I would not expect k-means clustering to work well with the 3 clusters in the provided graph. This is because each cluster contains data points which overlap with data points from other clusters. The linkage between these clusters could confuse the k-means algorithm, resulting in points from one cluster being classified as members of the other cluster, for each of the 3 clusters. Additionally, the shapes of the clusters are not ideal for k-means clustering. For example, the green cluster is shaped such that green data points closer to the vertical axis may be more likely to be classified as part of the Red cluster than the Green cluster (depending on the initial random mean). This is because the Green cluster is longer on it's horizontal axis than vertical axis, making it difficult to correctly classify points using Euclidean distance. 
+
+
+2. Consider the silouhette plots shown below (*see assignment*):
+
+a) What is the best number of clusters to choose?
+
+
+The best number of clusters to choose is 2 clusters, as clustering with k = 2 maximizes the silhouette score, Si, for each cluster and avoids negative values (indicating that a minimal amount of data was incorrectly classified). 
+
+
+b) What is the worst number of clusters to choose?
+
+
+The worst number of clusters to choose is 7 clusters, as clustering with k = 7 results in a cluster with a negative silhouette score and a number of clusters with relatively low silhouette scores, indicating that the clusters are poorly defined and contain data which would have been better classified in another cluster. 
+
+
+3. Using the zagat dataset from the smss package, complete the following
+tasks: (Note: you may need to load additional libraries to answer the questions.) This dataset contains information on 193 ratings of Italian restaurants in Boston, London, and New York. First read about the dataset (using ?? in the R console) then take a look at the data using the str and head functions.
+
+```{r, include=FALSE}
+install.packages("smss")
+```
+
+```{r}
+library(smss)
+data(zagat)
+# read about function in console using ?? function
+# data.frame with 193 observations of the following 6 variables:
+# City, Restaurant, Food, Decor, Service, and Cost
+str(zagat)
+head(zagat)
+```
+
+
+a) Create a box and whisker plot for “City” against “Cost” (“City” should be on the x-axis), and a bar chart displaying “City” (i.e. it should show the number of restaurants rated per city). Give each graph a title.
+
+```{r}
+library(ggplot2)
+g_whisker <- ggplot(zagat, aes(x=City, y=Cost))
+g_whisker <- g_whisker + geom_boxplot()
+g_whisker <- g_whisker + labs(x = "City", y = "Cost", title = "Restaraunt Costs for Each City in the Zagat Guide")
+g_whisker <- g_whisker + theme(plot.title = element_text(hjust = 0.5))
+g_whisker
+```
+
+```{r}
+g_bar <- ggplot(zagat, aes(x=City, fill=City))
+g_bar <- g_bar + geom_bar()
+g_bar <- g_bar + labs(title="Number of Restaraunts Reviewed in Each City", x="City", y="Total # Reviewed")
+g_bar <- g_bar + theme(plot.title = element_text(hjust = 0.5))
+g_bar
+```
+
+
+b) Display the 2 graphs in one image using R code (i.e. do not just screen grab the 2 images and combine them).
+
+```{r}
+library(gridExtra)
+grid.arrange(g_whisker, g_bar, ncol = 1)
+```
+
+
+c) Create a parallel co-ordinates plot using the predictor variables “Food”, “Decor”, “Service”, and “Cost”. The plot should be colour coded by “City”, and scale your graph using “uniminmax”.
+
+```{r}
+library("GGally")
+ggparcoord(zagat, columns=3:6, groupColumn="City", scale="uniminmax")
+```
+
+
+4. Consider the Parallel Co-ordinates plot below (*see assignment*); it displays 3 different types
+of response (which are colour coded).
+
+
+a) In your opinion, what is the best predictor variable for separating out the responses?
+
+
+B is the best predictor variable for separating out the responses, as the responses are separated into three distinct ranges of values, with no crossover or overlap. 
+
+
+
+END OF ASSIGNMENT. 
