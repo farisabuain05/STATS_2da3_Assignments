@@ -1,0 +1,132 @@
+---
+title: "STATS_2DA3_Assignment_1"
+author: "Faris Abuain"
+date: "2024-09-20"
+output: pdf_document
+geometry: margin=1.0in
+mainfont: Times New Roman
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
+1. 
+
+```{r}
+library(datasets)
+data(iris) # loading the iris dataset
+```
+
+a) Display the number of columns and number of rows in the Iris dataset using 1 or 2 lines of code.
+
+```{r}
+dim(iris) # returns vector (i, j), where i = # rows and j = # columns
+```
+
+Therefore we can see that the Iris dataset has 5 columns and 150 rows.
+
+
+b) How many variables are categorical and how many are continuous?
+
+```{r}
+head(iris)
+```
+
+Here we can see that of the 5 variables described in the Iris dataset, 4 variables are continuous: sepal length, sepal width, petal length, and petal width. Only 1 of the 5 variables, species, is categorical.
+
+
+c) Graph 1.
+
+```{r}
+library(ggplot2)
+g1 <- ggplot(iris, aes(x=Sepal.Length, y=Petal.Length))
+g1 <- g1 + geom_point(color='blue')
+g1 <- g1 + labs(x = "Sepal Length", y = "Petal Length", title = "Iris Data")
+g1 <- g1 + theme(plot.title = element_text(hjust = 0.5))
+g1
+```
+
+
+d) Graph 2.
+
+```{r}
+g2 <- ggplot(iris, aes(x=Species, fill=Species))
+g2 <- g2 + geom_bar()
+g2 <- g2 + labs(title="# of Each Species of Iris", x="Species", y="# of Specimens")
+g2 <- g2 + theme(plot.title = element_text(hjust = 0.5))
+g2
+```
+
+
+e) Display graphs 1 and 2 in same image using R code.
+
+```{r}
+library(gridExtra)
+grid.arrange(g1, g2, ncol = 1)
+```
+
+
+2. *See assignment for plot analyzed in this question.*
+
+a) Which vehicle type has the least observations associated with it in this dataset?
+
+The "2seater" vehicle type has by far the least observations associated with it, as evidenced by the width of the "2seater" bar compared to the other categorical variables in this dataset.
+
+
+b) For “suv” vehicles, what is the majority drive train type?
+
+The majority drive train type for "suv" vehicles is four wheel drive ('4').
+
+
+c) For “compact” vehicles, which of the 3 drive train types occurs least often?
+
+For "compact" vehicles, the least common drive train is rear wheel drive ('r'), which occurs 0 times for "compact" vehicles in this dataset.
+
+
+3. 
+
+``` {r, include=FALSE}
+install.packages("vcd")
+```
+```{r}
+library(vcd)
+data(Arthritis)
+```
+
+
+a) Double Decker Plot.
+
+```{r}
+dd <- doubledecker(Improved ~ Treatment + Sex, data=Arthritis, 
+                   gp=gpar(fill=c('blue', 'red', 'green')), margins=c(2, 5,
+                  4, 2))
+```
+
+
+b) For female patients in the Treated group, what was the most reported level of Improvement?
+
+The most reported level of improvement for females in the Treated group was 'Marked', suggesting that most female patients benefited from treatment.
+
+
+c) For male patients in the Treated group, what was the least reported level of Improvement?
+
+The least reported level of improvement for males in the Treated group was 
+'Some', suggesting most male patients who recieved the treatment either saw marked or no improvement in their condition
+
+
+d) Bar Chart.
+
+```{r}
+bc <- ggplot(Arthritis, aes(x=Treatment, fill=Improved))
+bc <- bc + geom_bar()
+bc <- bc + labs(x='Treatment Status', y='# of Patients', 
+                title='Improvement of Arthritis Patients by Treatment Status')
+bc <- bc + theme(plot.title = element_text(hjust = 0.5))
+bc
+```
+
+
+
+END OF ASSIGNMENT. 
