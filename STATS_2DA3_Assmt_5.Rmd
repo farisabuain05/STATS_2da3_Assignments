@@ -1,0 +1,181 @@
+---
+title: "STATS 2DA3 Assignment 5"
+author: "Faris Abuain"
+date: "2024-11-26"
+output: pdf_document
+geometry: margin=1.0in
+mainfont: Times New Roman
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
+
+1. Using the Assign5.csv dataset (.csv file) that can be found on the Avenue to Learn page under “Assignments”, complete the following tasks: (Note: you may need to load multiple libraries to answer the questions.)
+
+• use the default initialization and stopping conditions of the algorithm in question. Set the seed to 1234 whenever a seed is needed to ensure reproducibility of results.
+
+
+```{r}
+ass_5_data <- read.csv("~/Downloads/Assign5.csv")
+head(ass_5_data)
+str(ass_5_data)
+```
+
+
+a) Make the “Class” variable into a factor.
+
+```{r}
+ass_5_data$Class <- as.factor(ass_5_data$Class)
+```
+
+
+b) Remove the “Class” variable and scale the dataset.
+
+```{r}
+ass_5_no_class <- ass_5_data[, -ncol(ass_5_data)]
+
+scaled_ass_data <- scale(ass_5_no_class)
+head(scaled_ass_data)
+```
+
+
+c) Carry out Model-based clustering using Mclust with the ultimate goal to predict
+“Class”, using all remaining variables to produce your model. The model should
+consider 1 to 4 components (clusters).
+
+
+```{r, echo=FALSE}
+install.packages("mclust")
+```
+
+
+```{r} 
+library(mclust)
+set.seed(1234)
+
+mclust_model <- Mclust(scaled_ass_data,1:4)
+```
+
+
+i. According to the BIC, how many components give the best result?
+
+```{r}
+best_result_BIC <- mclust_model$G
+best_result_BIC
+```
+
+Therefore 4 components gives the best result.
+
+
+ii. Produce a graph showing the BICs for all fitted models as a function of the number
+of components.
+
+```{r}
+library(ggplot2)
+
+bic_vals <- mclust_model$BIC
+num_components <- 1:4
+bic_df <- data.frame(Components = num_components, BIC = bic_vals[1:4])
+
+
+bic_plot <- ggplot(bic_df, aes(x = Components, y = BIC))
+bic_plot <- bic_plot + geom_line() 
+bic_plot <- bic_plot + geom_point()
+bic_plot <-  bic_plot + labs(title = 
+                        "BIC Values for Fitted Models with Varying Number of Components", x = "Number of Components", y = "BIC") 
+bic_plot <- bic_plot + theme(plot.title = element_text(hjust = 0.5))
+
+bic_plot
+```
+
+
+d) Carry out Model-based clustering using gpcm with the ultimate goal to predict “Class”, using all remaining variables to produce your model. The model should consider 1 to 4 components (clusters).
+
+
+```{r}
+install.packages("mixture")
+```
+
+
+
+```{r}
+library(mixture)
+set.seed(1234)
+
+gpcm_model <- gpcm(scaled_ass_data, G = 1:4)  
+```
+
+
+i. Produce a table of results, showing actual class against predicted class.
+
+
+```{r}
+actual_class <- ass_5_data$Class
+
+predicted_class <- gpcm_model$map
+
+results_table <- table(predicted_class, actual_class)
+results_table
+```
+
+
+ii. What is the ARI correct to 4 decimal places?
+
+```{r}
+library(e1071)
+agreement_value <- classAgreement(results_table)
+ari_2 <- agreement_value$crand
+ari_rounded <- round(ari_2,4)
+ari_rounded
+```
+
+Therefore the adjusted rand index (ARI) is 0.8645 for our gpcm model. 
+
+
+2. 
+
+
+a) Set the seed to (1234) and generate 20 observations from a normal distribution with mean 4 and standard deviation 9. (Show the output)
+
+```{r}
+set.seed(1234)
+observations <- rnorm(20,4,9)
+print(observations)
+```
+
+
+b) Calculate the mean of these 20 numbers (correct to 3 places of decimals).
+
+```{r}
+mean_value <- round(mean(observations), 3)
+mean_value
+```
+
+
+c) Using the same seed, calculate a boot-strapped estimate of the mean of these 20
+numbers (correct to 3 places of decimals), using 50 bootstrapped samples. Use the
+sample function as part of your coding to carry out this task.
+
+
+```{r}
+bootstrap_means <- replicate(50, mean(sample(sample(observations, length(observations), replace = TRUE))))
+
+bootstrap_mean_rounded <- round(mean(bootstrap_means), 3)
+bootstrap_mean_rounded
+```
+
+d) What is the bias of the boot-strapped estimate of the mean?
+
+
+```{r}
+bias <- bootstrap_mean_rounded - mean_value
+bias
+```
+
+Thus the bias of the boot-strapped estimate is -0.112. 
+
+
+END OF ASSIGNMENT. 
