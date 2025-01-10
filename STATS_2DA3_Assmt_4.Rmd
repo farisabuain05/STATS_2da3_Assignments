@@ -1,0 +1,166 @@
+---
+title: "STATS 2DA3 Assignment 4"
+author: "Faris Abuain"
+date: "2024-11-11"
+output: pdf_document
+geometry: margin=1.0in
+mainfont: Times New Roman
+fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
+
+1. *Set the seed to 7394 for all questions*. This will make your work reproducible which is important for applications. You must provide answers, i.e. not just code.
+
+
+a) generate 5 random integers between 0 and 1, sampling with replacement.
+
+```{r}
+set.seed(7394)
+sample(0:1, 5, replace=TRUE)
+```
+
+
+With a seed of 7394, we obtain the following 5 integers: 0, 1, 0, 0, 0. 
+
+
+b) generate 8 random integers between 1 and 30, sampling without replacement.
+
+
+```{r}
+set.seed(7394)
+sample(1:30, 8, replace=FALSE)
+```
+
+
+With a seed of 7394, we obtain the following 8 integers: 21, 25, 1, 4, 26, 22, 14, 7.
+
+
+c) generate 5 random numbers from a normal distribution with mean 3 and standard
+deviation 7, and store in a vector “x”. Output the results from “x”.
+
+
+```{r}
+set.seed(7394)
+x <- rnorm(5, mean=3, sd=7)
+x
+```
+
+
+With a seed of 7394, we obtain the vector x = (7.547040, -4.957406, 11.101929, 11.373203, 1.006352). 
+
+
+
+2. Consider the diagram below. It shows labelled observations from three classes, class
+“Blue Circle”, class “Red Triangle” and class “Yellow Star”. It also shows an unlabelled observation depicted by an “x”. Note: the dashed circles are a visual aid, to help show distance. Using K-Nearest Neighbours classification, which class is the unlabelled observation assigned to when;
+
+
+i. K=3
+
+The 3 nearest labelled neighbors to the unlabeled observation, "x", are 'Yellow Star', 'Red Triangle', 'Red Triangle'. The majority class among these neighbors is 'Red Triangle', thus we assign the unlabeled observation "x" to the 'Red Triangle' class. 
+
+
+ii. K=9
+
+The 9 nearest labelled neighbors to the unlabeled observation, "x", are 2 'Yellow Stars', 2 'Red Triangles', and 5 'Blue Circles'. Therefore, the majority class among these neighbors is 'Blue Circle' and we assign the unlabeled observation "x" to the 'Blue Circle' class.
+
+
+
+3. Using the Assign4.csv dataset (.csv file) that can be found on the Avenue
+to Learn page under “Assignments”, complete the following tasks: (Note: you may need to load additional libraries to answer the questions.)
+
+
+```{r}
+assmt_data <- read.csv("~/Downloads/Assign4.csv")
+head(assmt_data)
+str(assmt_data)
+```
+
+
+a) Make the “Class” variable into a factor.
+
+```{r}
+assmt_data$Class <- factor(assmt_data$Class)
+```
+
+
+b)  Remove the “Class” variable and scale the dataset (note: you might need the “Class”
+variable later).
+
+```{r}
+class_var <- assmt_data$Class
+assmt_data_no_class <- assmt_data[, -ncol(assmt_data)]
+
+scaled_assmt_data <- scale(assmt_data_no_class)
+
+head(scaled_assmt_data)
+
+```
+
+
+c) Set the seed to 1234 and select 75% of the observations at random to be the Training
+set. Define the remaining observations as the Test set.
+
+```{r}
+set.seed(1234)
+
+train_index <- sample(seq_len(nrow(scaled_assmt_data)), 0.75*nrow(scaled_assmt_data))
+
+test_data <- scaled_assmt_data[-train_index,]
+train_data <- scaled_assmt_data[train_index,]
+
+train_target <- class_var[train_index]
+test_target <- class_var[-train_index]
+
+```
+
+
+d) Perform K nearest neighbours classification on your dataset, with K = 3. Your goal is
+to predict Class.
+
+```{r}
+install.packages("MASS")
+library(class)
+
+predicted_classes <- knn(train_data, test_data, train_target, 3)
+
+```
+
+
+e) Produce a classification table of your results.
+
+```{r}
+classification_table <- table(predicted_classes, test_target)
+print(classification_table)
+```
+
+
+f) What is the ARI, correct to 3 decimal places?
+
+```{r}
+install.packages("e1071")
+```
+
+```{r}
+library(e1071)
+agreement_values <- classAgreement(classification_table)
+ari <- agreement_values$crand
+ari_round <- round(ari,3)
+ari_round
+```
+
+Thus the adjusted Rand index (ARI) rounded to 3 places is 0.816. 
+
+
+g) What is the mis-classification rate, correct to the nearest percent?
+
+We have a total of 3403 observations, of which 260 are misclassified per our classification table in e). Thus our mis-classification rate is 260 / 3403 = 0.0764. Correctd to the nearest percent, our mis-classification rate is 8%. 
+
+
+
+
+
+END OF ASSIGNMENT. 
